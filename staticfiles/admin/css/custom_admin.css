@@ -1,0 +1,31 @@
+#changelist table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+#changelist table tbody tr {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#changelist table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+#changelist table th,
+#changelist table td {
+    padding: 12px;
+}
+
+#changelist table thead th {
+    background-color: #343a40;
+    color: white;
+}
+
+.field-get_points {
+    max-width: 100px;
+}
+
+.field-get_annotations {
+    max-width: 400px;
+}
