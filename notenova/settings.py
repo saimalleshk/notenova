@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "appnotenova",
+    "ckeditor",
 ]
 
 MIDDLEWARE = [
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'notenova.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'appnotenova/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,6 +103,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -130,3 +133,34 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+print("Template Dirs:", [os.path.exists(str(BASE_DIR / 'templates'))])
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': [
+            ['Format', 'Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['Link', 'Unlink'],
+            # Table tools group
+            ['Table', 'TableProperties', 'TableCellProperties', '-', 'TableRow', 'TableColumn'],
+            ['RemoveFormat', 'Source'],
+            ['Maximize']
+        ],
+        'height': 300,
+        'width': 800,
+        'removePlugins': 'stylesheetparser',
+        'extraPlugins': 'autogrow,table,tableresize,tabletools,tableselection',
+        'autoGrow_minHeight': 300,
+        'autoGrow_maxHeight': 600,
+        # Table specific settings
+        'table_defaultStyle': {
+            'borderCollapse': 'collapse',
+            'width': '100%'
+        },
+        'table_cell_paddings': '5px',
+        'table_cell_borders': '1px solid #ccc',
+    },
+}

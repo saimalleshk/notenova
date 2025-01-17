@@ -1,0 +1,11 @@
+{% load i18n admin_urls %}
+
+{% block submit_buttons_bottom %}
+    <div class="submit-row">
+        <input type="submit" value="Save" name="_save" class="default" />
+        <input type="submit" value="Save & Send to Chime" name="_save_and_chime" />
+        {% if show_save_and_continue %}
+            <input type="submit" value="Save and continue editing" name="_continue" />
+        {% endif %}
+    </div>
+{% endblock %}

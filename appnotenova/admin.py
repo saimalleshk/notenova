@@ -4,6 +4,15 @@ from django.utils.safestring import mark_safe
 from django.db.models import Avg, F, ExpressionWrapper, fields
 from django.utils import timezone
 from .models import Case, Point, TimeTracker
+import os
+from .models import NewsEntry
+from .forms import NewsEntryAdminForm  
+from django.http import HttpResponseRedirect
+import requests
+import json
+from django.core.mail import send_mail
+
+
 
 class PointInline(admin.TabularInline):
     model = Point
@@ -69,11 +78,6 @@ class CaseAdmin(admin.ModelAdmin):
             'all': ('admin/css/custom_admin.css',)
         }
 
-# ... rest of your admin.py file ...
-
-
-# ... rest of your admin.py file ...
-
 
 @admin.register(Point)
 class PointAdmin(admin.ModelAdmin):
@@ -95,3 +99,69 @@ class TimeTrackerAdmin(admin.ModelAdmin):
             return f"{int(minutes)} minutes"
         return "N/A"
     get_total_time.short_description = 'Total Time'
+
+
+
+
+
+# --------------------------------------- editing on 17/01/2025 ------------------
+from django.contrib import admin
+from django.http import HttpResponseRedirect
+from .models import NewsEntry
+import requests
+import json
+import html2text  # Change this import
+
+@admin.register(NewsEntry)
+class NewsEntryAdmin(admin.ModelAdmin):
+    list_display = ('headline', 'created_at')
+    search_fields = ('headline', 'paragraph')
+    readonly_fields = ('created_at',)
+
+    def send_to_chime(self, obj):
+        webhook_url = "https://hooks.chime.aws/incomingwebhooks/21d7ffa3-6a29-4ea9-85e8-c3a6bfd05751?token=TmJzaFlNbUp8MXx4Z0FiQTZ5N0xjT09rNm8wTGtLRjNnVkZyaDNvN2pncmMtOW8zOXc3YTZV"
+        formatted_date = obj.created_at.strftime('%Y-%m-%d')
+        
+        # Configure html2text
+        h = html2text.HTML2Text()
+        h.body_width = 0  # Don't wrap text
+        h.unicode_snob = True  # Use Unicode
+        h.tables = True  # Enable table formatting
+        
+        # Convert HTML to Markdown
+        markdown_content = h.handle(obj.paragraph)
+        
+        message = {
+            "Content": f"/md # {obj.headline}\n\n{markdown_content}\n\n_Posted on: {formatted_date}_"
+        }
+
+        try:
+            response = requests.post(
+                webhook_url,
+                data=json.dumps(message),
+                headers={'Content-Type': 'application/json'}
+            )
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            print(f"Error sending to Chime: {str(e)}")
+            return False
+
+    def response_change(self, request, obj):
+        if "_save_and_chime" in request.POST:
+            if self.send_to_chime(obj):
+                self.message_user(request, "Entry saved and sent to Chime successfully!")
+            else:
+                self.message_user(request, "Entry saved but failed to send to Chime!")
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
+    def response_add(self, request, obj, post_url_continue=None):
+        if "_save_and_chime" in request.POST:
+            if self.send_to_chime(obj):
+                self.message_user(request, "Entry saved and sent to Chime successfully!")
+            else:
+                self.message_user(request, "Entry saved but failed to send to Chime!")
+            return HttpResponseRedirect(".")
+        return super().response_add(request, obj, post_url_continue)
+

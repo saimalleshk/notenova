@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from ckeditor.fields import RichTextField
 
 class Case(models.Model):
     case_id = models.CharField(max_length=50, unique=True)
@@ -51,4 +52,13 @@ class TimeTracker(models.Model):
     def __str__(self):
         return f"{self.break_type} - {self.in_time}"
 
-    
+
+class NewsEntry(models.Model):
+    headline = models.CharField(max_length=200)
+    paragraph = RichTextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.headline
+
+
